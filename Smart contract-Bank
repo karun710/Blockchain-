@@ -1,0 +1,51 @@
+pragma solidity ^0.5.8;
+
+contract bank {
+    uint8 private count;
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    address public owner;
+    mapping (address => uint) private balances;
+    event deposite(address indexed accountAddress, uint amount);
+    
+    constructor() public payable {
+        require(msg.value == 25 ether);
+       
+        owner = msg.sender;
+        count = 0;
+    }
+
+
+    function withdraw(uint amount) public returns (uint balance) {
+        
+        if (amount <= balances[msg.sender]) {
+            balances[msg.sender] -= amount;
+            msg.sender.transfer(amount);
+        }
+        return balances[msg.sender];
+    }
+
+
+    function deposit() public payable returns (uint) {
+        balances[msg.sender] += msg.value;
+        emit deposite(msg.sender, msg.value);
+        return balances[msg.sender];
+    }
+
+
+    
+
+    function transfer(address receiver, uint256 numTokens) public  returns (bool) {
+        require(numTokens <= balances[msg.sender]);
+        balances[msg.sender] = balances[msg.sender]-numTokens;
+        balances[receiver] = balances[receiver]+numTokens;
+        emit Transfer(msg.sender, receiver, numTokens);
+        return true;
+    }
+
+    function balance() public view returns (uint) {
+        return balances[msg.sender];
+    }
+
+ 
+
+}
